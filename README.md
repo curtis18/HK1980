@@ -79,3 +79,34 @@ Covert from one system to another:
 easting, northing = 835411.431, 817266.016
 latitude, longitude = transformer.transform(northing, easting)
 ```
+
+## PHP
+```php
+<?php
+// Use a PSR-4 autoloader for the `proj4php` root namespace.
+include("vendor/autoload.php");
+
+use proj4php\Proj4php;
+use proj4php\Proj;
+use proj4php\Point;
+
+// Initialise Proj4
+$proj4 = new Proj4php();
+
+$proj4->addDef("EPSG:2326" ,'+proj=tmerc +lat_0=22.31213333333334 +lon_0=114.1785555555556 +k=1 +x_0=836694.05 +y_0=819069.8 +ellps=intl +towgs84=-162.619,-276.959,-161.764,0.067753,-2.24365,-1.15883,-1.09425 +units=m +no_defs ');
+
+// Create two different projections.
+$projHK1980    = new Proj('EPSG:2326', $proj4);
+$projWGS84  = new Proj('EPSG:4326', $proj4);
+
+// Create a point.
+$pointSrc = new Point(832699, 836055, $projHK1980);
+echo "Source: " . $pointSrc->toShortString() . " in HK1980 <br>";
+
+// Transform the point between datums.
+$pointDest = $proj4->transform($projWGS84, $pointSrc);
+echo "Conversion: " . $pointDest->toShortString() . " in WGS84<br><br>";
+
+// Source: 832699, 836055 in HK1980
+// Conversion: 114.14219796719 22.463983921629 in WGS84
+```
